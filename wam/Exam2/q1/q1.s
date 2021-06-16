@@ -1,0 +1,71 @@
+# COMP1521 Practice Prac Exam #1
+# int everyKth(int *src, int n, int k, int*dest)
+
+   .text
+   .globl everyKth
+
+# params: src=$a0, n=$a1, k=$a2, dest=$a3
+everyKth:
+# prologue
+   addi $sp, $sp, -4
+   sw   $fp, ($sp)
+   la   $fp, ($sp)
+   addi $sp, $sp, -4
+   sw   $ra, ($sp)
+   addi $sp, $sp, -4
+   sw   $s0, ($sp)
+   addi $sp, $sp, -4
+   sw   $s1, ($sp)
+   # if you need to save more $s? registers
+   # add the code to save them here
+
+# function body
+# locals: ...
+
+	move $s0, $a0							# s0 = src
+	move $s1, $a3							# s1 = dest
+	li $t0, 0								# i = 0
+	li $t1, 0								# j = 0
+	
+	for:
+		bge $t0, $a1, endfor
+		if:
+			div $t0, $a2					# i%k
+			mfhi $t2						# t2 = i%k
+			bnez $t2, endif
+			
+			#calculate offsets
+			mul $t3, $t1, 4					# t3 = joffset
+			mul $t4, $t0, 4					# t4 = ioffset
+			
+			# move by offsets
+			add $s0, $a0, $t4
+			add $s1, $a3, $t3
+			lw $s0, ($s0)
+			
+#			move $a0, $s0
+#			li $v0, 1
+#			syscall
+
+			sw $s0, ($s1)					# dest[j] = src[i]
+			add $t1, $t1, 1					# j++
+		endif:
+		add $t0, $t0, 1						# i++
+		j for
+	endfor:
+
+	move $v0, $t1
+
+# epilogue
+   # if you saved more than two $s? registers
+   # add the code to restore them here
+   lw   $s1, ($sp)
+   addi $sp, $sp, 4
+   lw   $s0, ($sp)
+   addi $sp, $sp, 4
+   lw   $ra, ($sp)
+   addi $sp, $sp, 4
+   lw   $fp, ($sp)
+   addi $sp, $sp, 4
+   j    $ra
+
